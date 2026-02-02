@@ -1,13 +1,4 @@
-`
-                                                                         
- ▄▄▄▄▄▄▄              ▄▄                ▄▄          ▄▄                   
-███▀▀▀▀▀              ██                ██          ██                   
-███       ▄███▄ ████▄ ████▄ ▄█▀█▄ ████▄ ██ ▄█▀█▄ ▄████ ▄████ ▄█▀█▄ ████▄ 
-███  ███▀ ██ ██ ██ ██ ██ ██ ██▄█▀ ██ ▀▀ ██ ██▄█▀ ██ ██ ██ ██ ██▄█▀ ██ ▀▀ 
-▀██████▀  ▀███▀ ████▀ ██ ██ ▀█▄▄▄ ██    ██ ▀█▄▄▄ ▀████ ▀████ ▀█▄▄▄ ██    
-                ██                                        ██             
-                ▀▀                                      ▀▀▀              
-`
+# Gopherledger
 
 Gopherledger is a simple, CLI-based expense tracker built with Go. It helps you manage your daily expenses directly from your terminal.
 
