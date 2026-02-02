@@ -43,6 +43,26 @@ Use the `delete` command to remove an expense by its ID. You can find the ID of 
 ./gl delete -i 123
 ```
 
+### View Expenses
+
+Use the `view` command to list expenses. You can view all expenses, filter by year, or see details of a specific expense by ID.
+
+```bash
+# View all expenses
+./gl view --all
+
+# View expenses for a specific year
+./gl view --year 2024
+
+# View a specific expense by ID
+./gl view --id 123
+
+# Using shorthand flags
+./gl view -a
+./gl view -y 2024
+./gl view -i 123
+```
+
 ## Storage
 
 Expenses are stored locally in a JSON file.

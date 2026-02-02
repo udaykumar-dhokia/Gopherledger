@@ -1,0 +1,14 @@
+# Binaries
+gl
+gl.exe
+
+# Data
+expenses.json
+
+# OS specific
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
