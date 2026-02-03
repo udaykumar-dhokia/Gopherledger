@@ -6,7 +6,6 @@ import (
 	"os"
 
 	"github.com/spf13/cobra"
-	"github.com/udaykumar-dhokia/Gopherledger/internal/storage"
 	"github.com/udaykumar-dhokia/Gopherledger/pkg/utils"
 )
 
@@ -32,24 +31,10 @@ func init() {
 }
 
 func delete(cmd *cobra.Command, args []string) {
-	file := storage.NewFile(storage.DefaultFilePath)
+	status, path := utils.OpenAndReadFile(&expenses)
 
-	_, err := os.Stat(file.Path)
-	if err != nil {
-		fmt.Println("No file is connected")
-		fmt.Println("Creating new file...")
-		os.Create(storage.DefaultFilePath)
+	if !status {
 		return
-	}
-
-	content, err := os.ReadFile(file.Path)
-	if err != nil {
-		fmt.Println("Error reading file")
-		return
-	}
-
-	if len(content) > 0 {
-		json.Unmarshal(content, &expenses)
 	}
 
 	idx, exists := utils.FindExpenseByID(expenses, id)
@@ -67,7 +52,6 @@ func delete(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	os.WriteFile(file.Path, data, 0644)
+	os.WriteFile(path, data, 0644)
 	fmt.Printf("Deleted transaction worth %.2f with ID: %d\n", expenses[idx].Amount, expenses[idx].ID)
-
 }

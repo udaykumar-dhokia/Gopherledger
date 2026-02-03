@@ -1,5 +1,7 @@
 # Gopherledger
 
+![Gopherledger Demo](./assets/demo.png)
+
 Gopherledger is a simple, CLI-based expense tracker built with Go. It helps you manage your daily expenses directly from your terminal.
 
 ## Installation
@@ -31,9 +33,24 @@ Use the `add` command to record a new expense. You must specify the amount using
 ./gl add -a 25.50 -n "Taxi"
 ```
 
+### Update an Expense
+
+Use the `update` command to modify an existing expense. You must specify the ID of the expense using the `--id` (or `-i`) flag. You can then update the amount with `--amount` (or `-a`) and the note with `--note` (or `-n`).
+
+```bash
+# Update transaction with ID 123 with a new amount and note
+./gl update --id 123 --amount 150 --note "Lunch"
+
+# Update only the amount
+./gl update -i 123 -a 200
+
+# Update only the note
+./gl update -i 123 -n "Dinner"
+```
+
 ### Delete an Expense
 
-Use the `delete` command to remove an expense by its ID. You can find the ID of an expense when you add it or by (future feature: listing expenses).
+Use the `delete` command to remove an expense by its ID. You can find the ID of an expense by listing them.
 
 ```bash
 # Delete transaction with ID 123
@@ -45,7 +62,7 @@ Use the `delete` command to remove an expense by its ID. You can find the ID of 
 
 ### View Expenses
 
-Use the `view` command to list expenses. You can view all expenses, filter by year, or see details of a specific expense by ID.
+Use the `view` command to list expenses. You can view all expenses, filter by year, or see details of a specific expense by ID. You can also filter expenses by amount.
 
 ```bash
 # View all expenses
@@ -57,12 +74,24 @@ Use the `view` command to list expenses. You can view all expenses, filter by ye
 # View a specific expense by ID
 ./gl view --id 123
 
+# View expenses greater than a certain amount
+./gl view --greater 100
+
+# View expenses less than a certain amount
+./gl view --less 50
+
 # Using shorthand flags
 ./gl view -a
 ./gl view -y 2024
 ./gl view -i 123
+./gl view -g 100
+./gl view -l 50
 ```
 
 ## Storage
 
-Expenses are stored locally in a JSON file.
+Expenses are stored locally in a `expenses.json` file.
+
+---
+
+Made with ❤️ by [Udaykumar Dhokia](https://github.com/udaykumar-dhokia) using Go.

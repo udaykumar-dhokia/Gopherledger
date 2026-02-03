@@ -1,14 +1,10 @@
 package cmd
 
 import (
-	"encoding/json"
 	"fmt"
-	"os"
-	"strings"
 
 	"github.com/spf13/cobra"
 	"github.com/udaykumar-dhokia/Gopherledger/internal/expense"
-	"github.com/udaykumar-dhokia/Gopherledger/internal/storage"
 	"github.com/udaykumar-dhokia/Gopherledger/pkg/utils"
 )
 
@@ -21,12 +17,18 @@ var viewCmd = &cobra.Command{
 		id, _ := cmd.Flags().GetInt("id")
 		all, _ := cmd.Flags().GetBool("all")
 		year, _ := cmd.Flags().GetString("year")
+		greater, _ := cmd.Flags().GetFloat64("greater")
+		less, _ := cmd.Flags().GetFloat64("less")
 		if id != 0 {
 			viewExpense(id)
 		} else if all {
 			viewAllExpenses()
 		} else if year != "" {
 			viewYearExpenses(year)
+		} else if greater != 0 {
+			viewGreaterThanExpenses(greater)
+		} else if less != 0 {
+			viewLessThanExpenses(less)
 		} else {
 			fmt.Println("Please provide an ID or use the --all flag")
 		}
@@ -39,28 +41,18 @@ func init() {
 	viewCmd.Flags().IntP("id", "i", 0, "ID of the expense to view")
 	viewCmd.Flags().BoolP("all", "a", false, "View all expenses")
 	viewCmd.Flags().StringP("year", "y", "", "View expenses of particular year")
+	viewCmd.Flags().Float64P("greater", "g", 0, "View expenses greater than X")
+	viewCmd.Flags().Float64P("less", "l", 0, "View expenses less than X")
 }
 
 func viewExpense(id int) {
-	file := storage.NewFile(storage.DefaultFilePath)
 
-	_, err := os.Stat(file.Path)
-	if err != nil {
-		fmt.Println("No file is connected")
-		fmt.Println("Creating new file...")
-		os.Create(storage.DefaultFilePath)
+	status, _ := utils.OpenAndReadFile(&expenses)
+
+	if !status {
 		return
 	}
 
-	content, err := os.ReadFile(file.Path)
-	if err != nil {
-		fmt.Println("Error reading file")
-		return
-	}
-
-	if len(content) > 0 {
-		json.Unmarshal(content, &expenses)
-	}
 	idx, exists := utils.FindExpenseByID(expenses, id)
 
 	if !exists {
@@ -76,24 +68,10 @@ func viewExpense(id int) {
 
 func viewAllExpenses() {
 
-	file := storage.NewFile(storage.DefaultFilePath)
+	status, _ := utils.OpenAndReadFile(&expenses)
 
-	_, err := os.Stat(file.Path)
-	if err != nil {
-		fmt.Println("No file is connected")
-		fmt.Println("Creating new file...")
-		os.Create(storage.DefaultFilePath)
+	if !status {
 		return
-	}
-
-	content, err := os.ReadFile(file.Path)
-	if err != nil {
-		fmt.Println("Error reading file")
-		return
-	}
-
-	if len(content) > 0 {
-		json.Unmarshal(content, &expenses)
 	}
 
 	fmt.Printf("%-5s %-20s %-15s %-10s\n", "ID", "Amount", "Note", "Date")
@@ -103,30 +81,17 @@ func viewAllExpenses() {
 }
 
 func viewYearExpenses(year string) {
-	file := storage.NewFile(storage.DefaultFilePath)
 
-	_, err := os.Stat(file.Path)
-	if err != nil {
-		fmt.Println("No file is connected")
-		fmt.Println("Creating new file...")
-		os.Create(storage.DefaultFilePath)
+	status, _ := utils.OpenAndReadFile(&expenses)
+
+	if !status {
 		return
-	}
-
-	content, err := os.ReadFile(file.Path)
-	if err != nil {
-		fmt.Println("Error reading file")
-		return
-	}
-
-	if len(content) > 0 {
-		json.Unmarshal(content, &expenses)
 	}
 
 	var sortedExpenses []expense.Expense
 
 	for _, exp := range expenses {
-		if strings.Contains(exp.CreatedAt, year) {
+		if exp.Year == year {
 			sortedExpenses = append(sortedExpenses, exp)
 		}
 	}
@@ -134,6 +99,48 @@ func viewYearExpenses(year string) {
 	if len(sortedExpenses) == 0 {
 		fmt.Printf("No expenses found for year %s", year)
 		return
+	}
+
+	fmt.Printf("%-5s %-20s %-15s %-10s\n", "ID", "Amount", "Note", "Date")
+	for _, exp := range sortedExpenses {
+		fmt.Printf("%-5d %-20.2f %-15s %-10s\n", exp.ID, exp.Amount, exp.Note, exp.CreatedAt)
+	}
+}
+
+func viewGreaterThanExpenses(greater float64) {
+	status, _ := utils.OpenAndReadFile(&expenses)
+
+	if !status {
+		return
+	}
+
+	var sortedExpenses []expense.Expense
+
+	for _, exp := range expenses {
+		if exp.Amount >= greater {
+			sortedExpenses = append(sortedExpenses, exp)
+		}
+	}
+
+	fmt.Printf("%-5s %-20s %-15s %-10s\n", "ID", "Amount", "Note", "Date")
+	for _, exp := range sortedExpenses {
+		fmt.Printf("%-5d %-20.2f %-15s %-10s\n", exp.ID, exp.Amount, exp.Note, exp.CreatedAt)
+	}
+}
+
+func viewLessThanExpenses(less float64) {
+	status, _ := utils.OpenAndReadFile(&expenses)
+
+	if !status {
+		return
+	}
+
+	var sortedExpenses []expense.Expense
+
+	for _, exp := range expenses {
+		if exp.Amount < less {
+			sortedExpenses = append(sortedExpenses, exp)
+		}
 	}
 
 	fmt.Printf("%-5s %-20s %-15s %-10s\n", "ID", "Amount", "Note", "Date")

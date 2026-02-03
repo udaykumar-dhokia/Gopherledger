@@ -8,7 +8,6 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/udaykumar-dhokia/Gopherledger/internal/expense"
-	"github.com/udaykumar-dhokia/Gopherledger/internal/storage"
 	"github.com/udaykumar-dhokia/Gopherledger/pkg/utils"
 )
 
@@ -31,24 +30,10 @@ func init() {
 }
 
 func add(cmd *cobra.Command, args []string) {
-	file := storage.NewFile(storage.DefaultFilePath)
+	status, path := utils.OpenAndReadFile(&expenses)
 
-	_, err := os.Stat(file.Path)
-	if err != nil {
-		fmt.Println("No file is connected")
-		fmt.Println("Creating new file...")
-		os.Create(storage.DefaultFilePath)
+	if !status {
 		return
-	}
-
-	content, err := os.ReadFile(file.Path)
-	if err != nil {
-		fmt.Println("Error reading file")
-		return
-	}
-
-	if len(content) > 0 {
-		json.Unmarshal(content, &expenses)
 	}
 
 	newExpense := expense.Expense{
@@ -56,6 +41,9 @@ func add(cmd *cobra.Command, args []string) {
 		Amount:    amount,
 		Note:      note,
 		CreatedAt: time.Now().Format("2006-01-02 Mon 15:04"),
+		Date:      time.Now().Format("2006-01-02"),
+		Month:     time.Now().Format("Jan"),
+		Year:      time.Now().Format("2006"),
 	}
 
 	expenses = append(expenses, newExpense)
@@ -66,6 +54,6 @@ func add(cmd *cobra.Command, args []string) {
 		return
 	}
 
-	os.WriteFile(file.Path, data, 0644)
+	os.WriteFile(path, data, 0644)
 	fmt.Printf("Added transaction worth %.2f on %s with ID: %d\n", amount, newExpense.CreatedAt, newExpense.ID)
 }
